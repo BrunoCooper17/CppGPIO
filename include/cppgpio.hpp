@@ -15,6 +15,7 @@
 #include <cppgpio/buttons.hpp>
 #include <cppgpio/lcd.hpp>
 #include <cppgpio/output.hpp>
+#include <cppgpio/MultiplexerPushButton8.hpp>
 
 
 #endif /* cppgpio_hpp */
