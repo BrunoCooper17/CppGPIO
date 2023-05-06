@@ -2,7 +2,7 @@
 // Created by brunocooper on 5/5/23.
 //
 
-#include "MultiplexerPushButton8.h"
+#include "cppgpio/MultiplexerPushButton8.hpp"
 
 
 namespace GPIO
