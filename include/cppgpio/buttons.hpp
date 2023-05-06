@@ -108,6 +108,7 @@ namespace GPIO {
 
         unsigned int get_pin() const { return m_pin; }
         unsigned int get_state() const { return m_state ? 1 : 0; }
+		bool get_gpio_read() const { return m_gpio.read(m_pin); }
         
     private:
         bool m_state;

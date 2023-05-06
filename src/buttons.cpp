@@ -282,9 +282,14 @@ bool DigitalIn::debounce()
     
     // is this a truly perfect digital 0 1 input? Then do not debounce..
 
-    if (m_min_trigger_interval.count() == 0) return true;
-    
-    auto now = std::chrono::steady_clock::now();
+    if (m_min_trigger_interval.count() == 0)
+	{
+		/** Fix: truly perfect digital input needs to change the state too... */
+		m_state = !m_state;
+		return true;
+	}
+
+	auto now = std::chrono::steady_clock::now();
     if ((now - m_last_triggered) < m_min_trigger_interval) return false;
 
     if (m_min_hold_interval.count() > 0) {
