@@ -91,7 +91,7 @@ namespace GPIO
 
 
 	private:
-		GPIO::DigitalIn ButtonIn;
+		GPIO::DirectIn ButtonIn;
 		GPIO::DigitalOut MultiplexerPinA;
 		GPIO::DigitalOut MultiplexerPinB;
 		GPIO::DigitalOut MultiplexerPinC;

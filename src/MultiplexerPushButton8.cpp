@@ -35,6 +35,7 @@ namespace GPIO
 			return false;
 		}
 
+		ButtonIn.start();
 		thread_loop = std::make_unique<std::thread>(&MultiplexerPushButton8::event_loop, this);
 
 		return true;
@@ -48,6 +49,7 @@ namespace GPIO
 			return false;
 		}
 
+		ButtonIn.stop();
 		bTerminate = true;
 
 		thread_loop->join();
@@ -70,7 +72,7 @@ namespace GPIO
 				MultiplexerConvert.Bool.bPinB ? MultiplexerPinB.on() : MultiplexerPinB.off();
 				MultiplexerConvert.Bool.bPinC ? MultiplexerPinC.on() : MultiplexerPinC.off();
 
-				const bool InputRead{ ButtonIn.get_gpio_read() };
+				const bool InputRead{ ButtonIn.is_on() };
 				const auto TimeNow{ std::chrono::steady_clock::now() };
 
 				/** Reset the time in every unpressed button */
@@ -87,7 +89,8 @@ namespace GPIO
 					}
 				}
 
-				/** Button was released, check the press valid (was it held? or at least was hold long enough for a tap)
+				/**
+				 * Button was released, check the press valid (was it held? or at least was hold long enough for a tap)
 				 */
 				if (!InputRead)
 				{
