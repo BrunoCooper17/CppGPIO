@@ -46,6 +46,7 @@ set(LIBHEADERS
 	include/cppgpio/i2c.hpp
 	include/cppgpio/lcd.hpp
 	include/cppgpio/output.hpp
+	include/cppgpio/MultiplexerPushButton8.hpp
 )
 
 set(CONVHEADER
@@ -64,6 +65,7 @@ set(SOURCES
 	src/lcd.cpp
 	src/output.cpp
 	src/tools.cpp
+	src/MultiplexerPushButton8.cpp
 )
 
 # BUILD
