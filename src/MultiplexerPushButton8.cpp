@@ -3,6 +3,7 @@
 //
 
 #include "cppgpio/MultiplexerPushButton8.hpp"
+#include <cstdint>
 
 
 namespace GPIO
@@ -106,6 +107,10 @@ namespace GPIO
 	{
 		ButtonIn.start();
 		MultiplexerControl.change_notify.emplace_back(
+			/**
+			 * This lambda was a Clion suggestion to register callback event via lambda.
+			 * The alternative was using std::bind
+			 */
 			[this](auto&& PH1)
 			{
 				OnMultiplexerChange(std::forward<decltype(PH1)>(PH1));
@@ -182,4 +187,79 @@ namespace GPIO
 			}
 		}
 	}
+
+
+	MultiplexerOutput8::MultiplexerOutput8(uint32_t InPinInput, MultiplexerControl8& InMultiplexerControl)
+		: SignalOut{ InPinInput }
+		, MultiplexerControl{ InMultiplexerControl }
+	{
+	}
+
+
+	bool MultiplexerOutput8::start()
+	{
+		MultiplexerControl.change_notify.emplace_back(
+			/**
+			 * This lambda was a Clion suggestion to register callback event via lambda.
+			 * The alternative was using std::bind
+			 */
+			[this](auto&& PH1)
+			{
+				OnMultiplexerChange(std::forward<decltype(PH1)>(PH1));
+			});
+
+		return true;
+	}
+
+
+	bool MultiplexerOutput8::stop()
+	{
+		return true;
+	}
+
+
+	void MultiplexerOutput8::SetOutputBoolFlag(const bool bFlag, const uint8_t Position)
+	{
+		if (Position > 7)
+		{
+			return;
+		}
+
+		InputFlags[Position] = bFlag;
+	}
+
+
+	void MultiplexerOutput8::SetOutputBoolFlag(const uint8_t Flags)
+	{
+		for (uint8_t Idx{ 0 }; Idx < 8; ++Idx)
+		{
+			InputFlags[Idx] = static_cast<bool>(Flags & (1 << Idx));
+		}
+	}
+
+
+	bool MultiplexerOutput8::GetOutputBoolFlag(uint8_t Position) const
+	{
+		return Position < InputFlags.size() ? InputFlags[Position] : false;
+	}
+
+
+	uint8_t MultiplexerOutput8::GetOutputBoolFlag() const
+	{
+		uint8_t Result = 0;
+
+		for (uint8_t Idx{ 0 }; Idx < 8; ++Idx)
+		{
+			Result |= static_cast<uint8_t>(InputFlags[Idx]) << Idx;
+		}
+
+		return Result;
+	}
+
+
+	void MultiplexerOutput8::OnMultiplexerChange(const UnionMultiplexer8& CurrentIndex)
+	{
+		InputFlags[CurrentIndex.Index] ? SignalOut.on() : SignalOut.off();
+	}
+
 } // namespace GPIO

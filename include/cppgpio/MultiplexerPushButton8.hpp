@@ -5,9 +5,9 @@
 #ifndef CPPGPIO_MULTIPLEXERPUSHBUTTON8_H
 #define CPPGPIO_MULTIPLEXERPUSHBUTTON8_H
 
-
+#include <array>
 #include <cppgpio.hpp>
-
+#include <cstdint>
 
 namespace GPIO
 {
@@ -17,7 +17,6 @@ namespace GPIO
 		uint8_t bPinB : 1;
 		uint8_t bPinA : 1;
 	};
-
 
 	union UnionMultiplexer8
 	{
@@ -30,7 +29,6 @@ namespace GPIO
 		}
 	};
 
-
 	/**
 	 * #todo: Add description
 	 */
@@ -39,7 +37,6 @@ namespace GPIO
 	public:
 		virtual void OnMultiplexerChange(const UnionMultiplexer8& CurrentIndex) = 0;
 	};
-
 
 	/**
 	 * #todo: Add description
@@ -63,23 +60,22 @@ namespace GPIO
 
 		/**
 		 * From InputDetect::start (buttons.hpp)
-		 * After completion of class initialization (that is, registration of callables
-		 * at the various function variables), signal here that the input detection
-		 * thread could finally be run. If start() is never called, no detection will
-		 * ever happen.
+		 * After completion of class initialization (that is, registration of
+		 * callables at the various function variables), signal here that the input
+		 * detection thread could finally be run. If start() is never called, no
+		 * detection will ever happen.
 		 */
 		bool start();
 
 		/**
 		 * From InputDetect::stop (buttons.hpp)
 		 * it is also possible to stop the running thread, but you would normally not
-		 * need to do it - the destructor does it automatically. If you call stop(), then
-		 * be prepared that it could take up to 500ms for it to return (or even longer if
-		 * the thread is currently not waiting for an event, but executing some long
-		 * running custom task in your code).
+		 * need to do it - the destructor does it automatically. If you call stop(),
+		 * then be prepared that it could take up to 500ms for it to return (or even
+		 * longer if the thread is currently not waiting for an event, but executing
+		 * some long running custom task in your code).
 		 */
 		bool stop();
-
 
 	private:
 		GPIO::DigitalOut MultiplexerPinA;
@@ -94,10 +90,10 @@ namespace GPIO
 		void event_loop();
 	};
 
-
 	/**
 	 * #todo: Add description
-	 * #todo: Refactor multiplexer out values so we can reuse it (and send an event to notify about new value to read)
+	 * #todo: Refactor multiplexer out values so we can reuse it (and send an event
+	 * to notify about new value to read)
 	 */
 	class MultiplexerPushButton8 : public MultiplexerBase
 	{
@@ -109,7 +105,8 @@ namespace GPIO
 			MultiplexerControl8& MultiplexerControl,
 			/** Define interval between two events */
 			std::chrono::nanoseconds InMinTriggerAction = std::chrono::milliseconds(2),
-			/** Define minimum amount of time the hast to be triggered to consider it Hold action */
+			/** Define minimum amount of time the hast to be triggered to consider it
+			   Hold action */
 			std::chrono::nanoseconds InMinHoldAction = std::chrono::milliseconds(750));
 
 		virtual ~MultiplexerPushButton8();
@@ -128,23 +125,22 @@ namespace GPIO
 
 		/**
 		 * From InputDetect::start (buttons.hpp)
-		 * After completion of class initialization (that is, registration of callables
-		 * at the various function variables), signal here that the input detection
-		 * thread could finally be run. If start() is never called, no detection will
-		 * ever happen.
+		 * After completion of class initialization (that is, registration of
+		 * callables at the various function variables), signal here that the input
+		 * detection thread could finally be run. If start() is never called, no
+		 * detection will ever happen.
 		 */
 		bool start();
 
 		/**
 		 * From InputDetect::stop (buttons.hpp)
 		 * it is also possible to stop the running thread, but you would normally not
-		 * need to do it - the destructor does it automatically. If you call stop(), then
-		 * be prepared that it could take up to 500ms for it to return (or even longer if
-		 * the thread is currently not waiting for an event, but executing some long
-		 * running custom task in your code).
+		 * need to do it - the destructor does it automatically. If you call stop(),
+		 * then be prepared that it could take up to 500ms for it to return (or even
+		 * longer if the thread is currently not waiting for an event, but executing
+		 * some long running custom task in your code).
 		 */
 		bool stop();
-
 
 	private:
 		GPIO::DirectIn ButtonIn;
@@ -157,6 +153,72 @@ namespace GPIO
 		std::array<std::chrono::steady_clock::time_point, 8> ButtonLastPushed;
 		std::array<bool, 8> ButtonLastState{ false };
 		std::array<bool, 8> ButtonCheckHeldState{ false };
+
+		void OnMultiplexerChange(const UnionMultiplexer8& CurrentIndex) override;
+	};
+
+
+	class MultiplexerOutput8 : public MultiplexerBase
+	{
+		MultiplexerOutput8(
+			/** Multiplexer Output pin */
+			uint32_t InPinInput,
+			/** Multiplexer control */
+			MultiplexerControl8& InMultiplexerControl);
+
+		virtual ~MultiplexerOutput8();
+
+
+		/**
+		 * From InputDetect::start (buttons.hpp)
+		 * After completion of class initialization (that is, registration of
+		 * callables at the various function variables), signal here that the input
+		 * detection thread could finally be run. If start() is never called, no
+		 * detection will ever happen.
+		 */
+		bool start();
+
+		/**
+		 * From InputDetect::stop (buttons.hpp)
+		 * it is also possible to stop the running thread, but you would normally not
+		 * need to do it - the destructor does it automatically. If you call stop(),
+		 * then be prepared that it could take up to 500ms for it to return (or even
+		 * longer if the thread is currently not waiting for an event, but executing
+		 * some long running custom task in your code).
+		 */
+		bool stop();
+
+		/**
+		 * Sets the value the multiplexer must send once the multiplexer controller
+		 * indicate
+		 */
+		void SetOutputBoolFlag(const bool bFlag, const uint8_t Position);
+
+		/**
+		 * Same as SetOutputBoolFlag but accept a full uint8_t to update all
+		 * entries at once
+		 */
+		void SetOutputBoolFlag(const uint8_t Flags);
+
+		/** Return the current state in Position */
+		bool GetOutputBoolFlag(uint8_t Position) const;
+
+		/** Return all the flag states of the multiplexer */
+		uint8_t GetOutputBoolFlag() const;
+
+
+	private:
+		/** Signal input for the multiplexer. This is what are we going to send out */
+		GPIO::DigitalOut SignalOut;
+
+		/** Input flags we are going to send with the multiplexer */
+		std::array<bool, 8> InputFlags{ false };
+
+		/**
+		 * Clock that will indicate us the current flag value we are going
+		 * to send with input pin
+		 */
+		GPIO::MultiplexerControl8& MultiplexerControl;
 
 		void OnMultiplexerChange(const UnionMultiplexer8& CurrentIndex) override;
 	};
