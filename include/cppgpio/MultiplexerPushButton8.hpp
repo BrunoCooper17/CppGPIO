@@ -160,6 +160,7 @@ namespace GPIO
 
 	class MultiplexerOutput8 : public MultiplexerBase
 	{
+	public:
 		MultiplexerOutput8(
 			/** Multiplexer Output pin */
 			uint32_t InPinInput,
