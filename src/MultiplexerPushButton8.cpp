@@ -196,6 +196,12 @@ namespace GPIO
 	}
 
 
+	MultiplexerOutput8::~MultiplexerOutput8()
+	{
+		stop();
+	}
+
+
 	bool MultiplexerOutput8::start()
 	{
 		MultiplexerControl.change_notify.emplace_back(
